@@ -10,6 +10,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.truelogic.spring5.model.Emails;
 
@@ -23,12 +25,14 @@ public class EmailsDAO {
 		sessionFactory = sf;
 	}
 	
+	@Transactional(readOnly = true, propagation=Propagation.NOT_SUPPORTED)
 	public int addEmail(Emails e) {
 		Session session = sessionFactory.getCurrentSession();
 		int retVal = (int) session.save(e);
 		return retVal;
 	}
 	
+	@Transactional(readOnly = true, propagation=Propagation.NOT_SUPPORTED)
 	public void updateEmail(Emails e) {
 		Session session = sessionFactory.getCurrentSession();
 		session.update(e);
@@ -78,7 +82,7 @@ public class EmailsDAO {
 	@SuppressWarnings({"deprecation"})
 	public Emails getRowByEmailId(String emailId) {
 		Session session = sessionFactory.getCurrentSession();
-		String sql = "select count(*) as total from Emails e where e.email = :email";
+		String sql = "from Emails e where e.email = :email";
 		Query query = session.createQuery(sql);
 		query.setParameter("email", emailId);
 		

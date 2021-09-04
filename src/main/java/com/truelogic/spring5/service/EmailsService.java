@@ -14,6 +14,7 @@ import com.truelogic.spring5.model.Emails;
 
 
 @Service("emailsService")
+
 public class EmailsService {
 
 	private EmailsDAO emailsDAO;

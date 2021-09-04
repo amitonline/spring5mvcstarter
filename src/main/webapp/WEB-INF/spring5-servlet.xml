@@ -3,14 +3,19 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
         xmlns:context="http://www.springframework.org/schema/context"  
         xmlns:mvc="http://www.springframework.org/schema/mvc"  
+        xmlns:tx="http://www.springframework.org/schema/tx"
         xsi:schemaLocation="  
             http://www.springframework.org/schema/beans  
             http://www.springframework.org/schema/beans/spring-beans.xsd  
             http://www.springframework.org/schema/context  
             http://www.springframework.org/schema/context/spring-context.xsd  
             http://www.springframework.org/schema/mvc  
-            http://www.springframework.org/schema/mvc/spring-mvc.xsd">  
+            http://www.springframework.org/schema/mvc/spring-mvc.xsd
+            http://www.springframework.org/schema/tx 
+            http://www.springframework.org/schema/tx/spring-tx.xsd">  
       
+        <tx:annotation-driven transaction-manager="transactionManager"/> 
+    
         <!-- Provide support for component scanning -->  
         <context:component-scan base-package="com.truelogic.spring5" />  
       
@@ -24,13 +29,92 @@
    		 </bean>
      
      
-  <beans:bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
         destroy-method="close">
-        <beans:property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <beans:property name="url" value="jdbc:mysql://localhost:3306/mlist" />
-        <beans:property name="username" value="root" />
-        <beans:property name="password" value="master" />
-		<beans:property name="validationQuery" value="SELECT 1" />   
- </beans:bean>    
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/mlist" />
+        <property name="username" value="root" />
+        <property name="password" value="master" />
+		<property name="validationQuery" value="SELECT 1" />   
+ </bean>    
+ 
+  <bean id="hibernate5AnnotatedSessionFactory"
+        class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+         
+        <property name="annotatedClasses">
+            <list>
+                <value>com.truelogic.spring5.model.Emails</value>
+            </list>
+        </property>
+        
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+                </prop>
+                <prop key="hibernate.show_sql">false</prop>
+            </props>
+        </property>
+    </bean>
+     
+      <bean id="emailsDAO" class="com.truelogic.spring5.dao.EmailsDAO">
+        <property name="sessionFactory" ref="hibernate5AnnotatedSessionFactory" />
+    </bean>
+    <bean id="emailsService" class="com.truelogic.spring5.service.EmailsService">
+        <property name="emailsDAO" ref="emailsDAO"></property>
+    </bean>
+     
+      <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="smtpout.secureserver.net"/>
+        <property name="port" value="3535"/>
+        <property name="username" value="webmaster@email.com"/>
+        <property name="password" value="password"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.debug">false</prop>
+            </props>
+        </property>
+    </bean>
+     
+    <!-- You can have some pre-configured messagess also which are ready to send -->
+    <bean id="preConfiguredMessage" class="org.springframework.mail.SimpleMailMessage">
+        <property name="to" value="recipient@email.com"></property>
+        <property name="from" value="sender@email.com"></property>
+        <property name="subject" value="Default Subject matter"></property>
+    </bean> 
+     
+     
+     
+     <!-- Transaction Manager  -->
+     
+     
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="hibernate5AnnotatedSessionFactory" />
+    </bean>
+ 
+      <!-- Task Executor   -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5" />
+        <property name="maxPoolSize" value="10" />
+        <property name="queueCapacity" value="25" />
+    </bean>
+    
+ 
+    
+  	<!-- Cache Manager   -->
+ 	 <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+         <property name="caches">
+             <set>
+                 <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean">
+                     <property name="name" value="default"/>
+                 </bean>
+             </set>
+         </property>
+     </bean>
+     
+      <context:component-scan base-package="com.truelogic.spring5" />
      
     </beans>  
