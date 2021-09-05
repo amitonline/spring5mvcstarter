@@ -2,8 +2,6 @@
 <%@ include file="components/header.jsp" %>
 <%@ page session="false" %>
 
-<?php require_once($g_docRoot . "components/header.php"); ?>
-
 
   <div class="container mt-3">	
 	<div class="jumbotron">

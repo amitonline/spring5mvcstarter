@@ -63,18 +63,21 @@
     <bean id="emailsService" class="com.truelogic.spring5.service.EmailsService">
         <property name="emailsDAO" ref="emailsDAO"></property>
     </bean>
+    
+    <bean id="mailerService" class="com.truelogic.spring5.service.MailerService">
+    </bean>
      
       <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="smtpout.secureserver.net"/>
-        <property name="port" value="3535"/>
-        <property name="username" value="webmaster@email.com"/>
+        <property name="host" value="mail.server.in"/>
+        <property name="port" value="587"/>
+        <property name="username" value="support@server.in"/>
         <property name="password" value="password"/>
-        <property name="javaMailProperties">
+        <property name="javaMailProperties"> 
             <props>
                 <prop key="mail.transport.protocol">smtp</prop>
                 <prop key="mail.smtp.auth">true</prop>
-                <prop key="mail.smtp.starttls.enable">true</prop>
-                <prop key="mail.debug">false</prop>
+                <prop key="mail.smtp.starttls.enable">false</prop>
+                <prop key="mail.debug">true</prop>
             </props>
         </property>
     </bean>

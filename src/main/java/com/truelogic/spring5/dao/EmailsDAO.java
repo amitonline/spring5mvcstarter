@@ -32,7 +32,7 @@ public class EmailsDAO {
 		return retVal;
 	}
 	
-	@Transactional(readOnly = true, propagation=Propagation.NOT_SUPPORTED)
+	@Transactional
 	public void updateEmail(Emails e) {
 		Session session = sessionFactory.getCurrentSession();
 		session.update(e);
@@ -64,7 +64,7 @@ public class EmailsDAO {
 	@SuppressWarnings({"deprecation"})
 	public List<Emails> getEmails(String emailId, int firstRow, int maxRows) {
 		Session session = sessionFactory.getCurrentSession();
-		String sql = "select count(*) as total from Emails e where e.ID > 0";
+		String sql = "from Emails e where e.ID > 0";
 		if (emailId != null && !emailId.equals(""))
 			sql += " and email like :email";
 		sql += " order by email";
@@ -97,7 +97,7 @@ public class EmailsDAO {
 	@SuppressWarnings({"deprecation"})
 	public Emails getRowByVerifyCode(String vcode) {
 		Session session = sessionFactory.getCurrentSession();
-		String sql = "select count(*) as total from Emails e where e.vKey = :vkey";
+		String sql = "from Emails e where e.vKey = :vkey";
 		Query query = session.createQuery(sql);
 		query.setParameter("vkey", vcode);
 		
